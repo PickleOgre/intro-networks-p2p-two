@@ -1,26 +1,8 @@
-#ifndef P2P_TOOLS_H
-#define P2P_TOOLS_H
-
 /* Group Members: Joe Lawrence, Nate Smith
  * Class: EECE 446, Introduction to Computer Networking
  * Semester: Fall 2025 */
 
-/* This library contains the code for our P2P functions, including JOIN,
- * PUBLISH, SEARCH, and EXIT.*/
-
-#include "net_tools.h"
-#include <arpa/inet.h>
-#include <dirent.h>
-#include <iostream>
-#include <netdb.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <string>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <vector>
+#include "p2p_tools.h"
 using std::cout;
 using std::endl;
 using std::string;
@@ -42,7 +24,7 @@ join(const char* host, const char* port, uint32_t peerID)
   memcpy(req + 1, &peerNetID, sizeof(peerNetID)); // peerID is 4 bytes
 
   if ((sockd = lookup_and_connect(host, port)) < 0) {
-    cerr << "Failed lookup and connect" << endl;
+    std::cerr << "Failed lookup and connect" << endl;
     return -1;
   }
 
@@ -134,7 +116,7 @@ search(int sockd, const string& filename)
   // Get response from registry
   char response[10];
   if (safeRecv(sockd, response, 10) < 10) {
-    cerr << "Error receiving search response" << endl;
+    std::cerr << "Error receiving search response" << endl;
     return -1;
   }
 
@@ -167,6 +149,4 @@ search(int sockd, const string& filename)
   cout << ipStr << ":" << port << endl;
 
   return 0;
-}
-
-#endif
+} 

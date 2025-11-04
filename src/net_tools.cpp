@@ -1,22 +1,8 @@
-#ifndef NET_TOOLS_H
-#define NET_TOOLS_H
-
 /* Group Members: Joe Lawrence, Nate Smith
  * Class: EECE 446, Introduction to Computer Networking
  * Semester: Fall 2025 */
 
-/* These functions are useful for general network programming. Prioritize using
- * safeSend() and SafeRecv() over native functions when possible*/
-
-#include <errno.h>
-#include <iostream>
-#include <netdb.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include "net_tools.h" 
 using std::cerr;
 using std::endl;
 
@@ -144,5 +130,3 @@ safeRecv(const int sockd, char* buf, const ssize_t len)
   }
   return total_bytes_received; // Success
 }
-
-#endif

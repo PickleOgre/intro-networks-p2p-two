@@ -16,6 +16,8 @@ using std::stoul;
 using std::cout;
 using std::cin;
 using std::string;
+using std::cerr;
+using std::endl;
 
 int
 main(int argc, char* argv[])
