@@ -8,10 +8,6 @@ using std::endl;
 using std::string;
 using std::vector;
 
-/*Peers use the JOIN action to notify the registry that they wish to participate
- * in the P2P network.  Peers should JOIN the P2P network by sending an
- * appropriate JOIN request to the registry before sending any other request.
- * Returns the socket descriptor, or -1 on error.*/
 int
 join(const char* host, const char* port, uint32_t peerID)
 {
@@ -35,8 +31,6 @@ join(const char* host, const char* port, uint32_t peerID)
   return sockd;
 }
 
-/* A peer uses the PUBLISH action to inform the registry about the files it has
- * available to share. Returns -1 on error or 0 otherwise.*/
 int
 publish(int sockd)
 {
@@ -94,9 +88,6 @@ publish(int sockd)
   return 0;
 }
 
-/*A peer uses the SEARCH action to locate another peer that contains a file of
- * interest.  Within the SEARCH request, the peer sends the file name the
- * registry should locate.  Search returns -1 on error and 0 otherwise.*/
 int
 search(int sockd, const string& filename)
 {
@@ -150,3 +141,6 @@ search(int sockd, const string& filename)
 
   return 0;
 } 
+
+int
+fetch(std::string filename);

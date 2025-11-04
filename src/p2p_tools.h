@@ -40,4 +40,10 @@ publish(int sockd);
 int
 search(int sockd, const std::string& filename);
 
+/* Peers use the FETCH action to request a file from another peer in the P2P
+ * network.  Peers must JOIN (or REGISTER to) the P2P network before sending a
+ * FETCH request. */
+int
+fetch(std::string filename);
+
 #endif

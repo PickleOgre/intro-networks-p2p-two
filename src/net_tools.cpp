@@ -6,13 +6,6 @@
 using std::cerr;
 using std::endl;
 
-/*
- * Lookup a host IP address and connect to it using service. Arguments match the
- * first two arguments to getaddrinfo(3).
- *
- * Returns a connected socket descriptor or -1 on error. Caller is responsible
- * for closing the returned socket.
- */
 int
 lookup_and_connect(const char* host, const char* service)
 {
@@ -55,7 +48,6 @@ lookup_and_connect(const char* host, const char* service)
   return s;
 }
 
-/* Sends data to the target socket, handling partial sends. */
 int
 safeSend(const int sockd, const char* buf, const ssize_t len)
 {
@@ -95,7 +87,6 @@ safeSend(const int sockd, const char* buf, const ssize_t len)
   return total_bytes_sent;
 }
 
-/* Recieves data from the socket, handling partial recieves. */
 int
 safeRecv(const int sockd, char* buf, const ssize_t len)
 {
