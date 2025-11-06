@@ -144,34 +144,37 @@ search(int sockd, const string& filename)
 int
 fetch(int sockd, const string& filename)
 {
-  //1 (action code) + (file) + 1 (endl)
+  // 1 (action code) + (file) + 1 (endl)
   size_t msgSize = 1 + filename.length() + 1;
   char* req = new char[msgSize];
   req[0] = 0x02;
   memcpy(req + 1, filename.c_str(), msgSize - 1);
-  if ( safeSend(sockd, req, msgSize) < 0 ) 
-  {
+  if (safeSend(sockd, req, msgSize) < 0) {
     delete[] req;
     return -1;
   }
   delete[] req;
-  char response[10]; //4bytes peer + 4bytes ip + 2bytes port
-  if ( safeRecv(sockd, response, 10) < 10 ) //essentially a hard coded search (should make into a more robust func for p4 but will take some refactoring)
+  char response[10]; // 4bytes peer + 4bytes ip + 2bytes port
+  if (safeRecv(sockd, response, 10) <
+      10) // essentially a hard coded search (should make into a more robust
+          // func for p4 but will take some refactoring)
   {
     cerr << "Err receiving search response" << endl;
     return -1;
   }
 
-  uint32_t peerID, ipAddr; //vars for response feild (can split this section & onwards into helper func latr)
+  uint32_t peerID, ipAddr; // vars for response feild (can split this section &
+                           // onwards into helper func latr)
   uint16_t port;
-  memcpy(&peerID, response, 4); // peer id 0-3
+  memcpy(&peerID, response, 4);     // peer id 0-3
   memcpy(&ipAddr, response + 4, 4); // ip 4-7
-  memcpy(&port, response + 8, 2); // 8-9 port
+  memcpy(&port, response + 8, 2);   // 8-9 port
   peerID = ntohl(peerID);
   ipAddr = ntohl(ipAddr);
-  port   = ntohs(port);
+  port = ntohs(port);
 
-  if (peerID == 0 && ipAddr == 0 && port == 0) { //handle file not found technically this is a succes
+  if (peerID == 0 && ipAddr == 0 &&
+      port == 0) { // handle file not found technically this is a success
     cout << "File not indexed by registry" << endl;
     return 0;
   }
@@ -192,42 +195,26 @@ fetch(int sockd, const string& filename)
   fetchReq[0] = 0x03;
   memcpy(fetchReq + 1, filename.c_str(), fetchMsgSize - 1);
 
-  if (safeSend(peerSockd, fetchReq, fetchMsgSize) < 0) 
-  {
+  if (safeSend(peerSockd, fetchReq, fetchMsgSize) < 0) {
     delete[] fetchReq;
     close(peerSockd);
     return -1;
   }
-  //cleanup
+  // cleanup
   delete[] fetchReq;
 
-  /*rest of fetch -> TODO
-  
-  
-  */
-  close(peerSockd);
-  return 0;
-  
-fetch(string filename)
-{
-
-  // Test Vars
-  const char* file_name = "some_file.txt";
-
-  // Recieve and save
-  int sockd = 0;
+  // Recieve and output to file.
   const size_t len = 1024;
-  char buf[len];
-  std::ofstream output_file(file_name, std::ios::binary);
+  char resp[len];
+  std::ofstream output_file(filename, std::ios::binary);
 
   bool socket_open = true;
   while (socket_open == true) {
-    
-    ssize_t bytes_received = 0; // The amount of bytes that have been recieved
-                                // since the start of the buffer.
-    bytes_received = safeRecv(sockd, buf, len);
+    // Loop until the socket closes
+    ssize_t bytes_received = 0;
+    bytes_received = safeRecv(peerSockd, resp, len);
     if (bytes_received > 0) {
-      output_file.write(buf, bytes_received);
+      output_file.write(resp, bytes_received);
       output_file.flush();
     } else if (bytes_received == 0) {
       socket_open = false;
@@ -235,4 +222,7 @@ fetch(string filename)
   }
 
   output_file.close();
+
+  close(peerSockd);
+  return 0;
 }
