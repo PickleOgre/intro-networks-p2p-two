@@ -3,6 +3,7 @@
  * Semester: Fall 2025 */
 
 #include "p2p_tools.h"
+using std::cerr;
 using std::cout;
 using std::endl;
 using std::string;
@@ -129,10 +130,8 @@ search(int sockd, const string& filename)
   }
 
   // convert for print
-  struct in_addr addr;
-  addr.s_addr = htonl(ipAddr);
   char ipStr[INET_ADDRSTRLEN];
-  inet_ntop(AF_INET, &addr, ipStr, INET_ADDRSTRLEN);
+  ipToString(ipAddr, ipStr);
 
   // Output
   cout << "File found at" << endl;
@@ -140,7 +139,72 @@ search(int sockd, const string& filename)
   cout << ipStr << ":" << port << endl;
 
   return 0;
-} 
+}
 
 int
-fetch(std::string filename);
+fetch(int sockd, const string& filename)
+{
+  //1 (action code) + (file) + 1 (endl)
+  size_t msgSize = 1 + filename.length() + 1;
+  char* req = new char[msgSize];
+  req[0] = 0x02;
+  memcpy(req + 1, filename.c_str(), msgSize - 1);
+  if ( safeSend(sockd, req, msgSize) < 0 ) 
+  {
+    delete[] req;
+    return -1;
+  }
+  delete[] req;
+  char response[10]; //4bytes peer + 4bytes ip + 2bytes port
+  if ( safeRecv(sockd, response, 10) < 10 ) //essentially a hard coded search (should make into a more robust func for p4 but will take some refactoring)
+  {
+    cerr << "Err receiving search response" << endl;
+    return -1;
+  }
+
+  uint32_t peerID, ipAddr; //vars for response feild (can split this section & onwards into helper func latr)
+  uint16_t port;
+  memcpy(&peerID, response, 4); // peer id 0-3
+  memcpy(&ipAddr, response + 4, 4); // ip 4-7
+  memcpy(&port, response + 8, 2); // 8-9 port
+  peerID = ntohl(peerID);
+  ipAddr = ntohl(ipAddr);
+  port   = ntohs(port);
+
+  if (peerID == 0 && ipAddr == 0 && port == 0) { //handle file not found technically this is a succes
+    cout << "File not indexed by registry" << endl;
+    return 0;
+  }
+
+  char ipStr[INET_ADDRSTRLEN];
+  char portStr[6];
+  ipToString(ipAddr, ipStr);
+  portToString(port, portStr);
+
+  int peerSockd = lookup_and_connect(ipStr, portStr);
+  if (peerSockd < 0) {
+    cerr << "Failed to connect to peer" << endl;
+    return -1;
+  }
+
+  size_t fetchMsgSize = 1 + filename.length() + 1;
+  char* fetchReq = new char[fetchMsgSize];
+  fetchReq[0] = 0x03;
+  memcpy(fetchReq + 1, filename.c_str(), fetchMsgSize - 1);
+
+  if (safeSend(peerSockd, fetchReq, fetchMsgSize) < 0) 
+  {
+    delete[] fetchReq;
+    close(peerSockd);
+    return -1;
+  }
+  //cleanup
+  delete[] fetchReq;
+
+  /*rest of fetch -> TODO
+  
+  
+  */
+  close(peerSockd);
+  return 0;
+}

@@ -2,7 +2,8 @@
  * Class: EECE 446, Introduction to Computer Networking
  * Semester: Fall 2025 */
 
-#include "net_tools.h" 
+#include "net_tools.h"
+#include <arpa/inet.h>
 using std::cerr;
 using std::endl;
 
@@ -120,4 +121,18 @@ safeRecv(const int sockd, char* buf, const ssize_t len)
     }
   }
   return total_bytes_received; // Success
+}
+
+void
+ipToString(uint32_t ipAddr, char* ipStr)
+{
+  struct in_addr addr;
+  addr.s_addr = htonl(ipAddr);
+  inet_ntop(AF_INET, &addr, ipStr, INET_ADDRSTRLEN);
+}
+
+void
+portToString(uint16_t port, char* portStr)
+{
+  snprintf(portStr, 6, "%u", port);
 }
