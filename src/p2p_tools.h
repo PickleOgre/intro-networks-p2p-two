@@ -21,6 +21,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <vector>
+#include <fstream>
 
 /*Peers use the JOIN action to notify the registry that they wish to participate
  * in the P2P network.  Peers should JOIN the P2P network by sending an
