@@ -147,21 +147,27 @@ fetch(string filename)
 {
 
   // Test Vars
-  char filename = "some_file.txt";
+  const char* file_name = "some_file.txt";
 
   // Recieve and save
   int sockd = 0;
-  const ssize_t len = 1028;
+  const size_t len = 1024;
   char buf[len];
-  ofstream output_file(file_name)
+  std::ofstream output_file(file_name, std::ios::binary);
 
   bool socket_open = true;
   while (socket_open == true) {
-    ssize_t msg_size = 0; // The amount of bytes recieved in a single recv()
-                          // call
+    
     ssize_t bytes_received = 0; // The amount of bytes that have been recieved
                                 // since the start of the buffer.
-    while (bytes_received < len) {
+    bytes_received = safeRecv(sockd, buf, len);
+    if (bytes_received > 0) {
+      output_file.write(buf, bytes_received);
+      output_file.flush();
+    } else if (bytes_received == 0) {
+      socket_open = false;
     }
   }
+
+  output_file.close();
 }
