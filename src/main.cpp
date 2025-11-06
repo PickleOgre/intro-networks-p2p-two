@@ -63,11 +63,18 @@ main(int argc, char* argv[])
       if (search(sockd, filename) < 0) {
         cerr << "SEARCH failed" << endl;
       }
+    } else if (cmd == "FETCH") {
+      cout << "Enter a file name: ";
+      string filename;
+      cin >> filename;
+      if (fetch(sockd, filename) < 0) {
+        cerr << "FETCH failed" << endl;
+      }
     } else if (cmd == "EXIT") {
       close(sockd);
       running = false;
     } else {
-      cout << "Commands: JOIN, PUBLISH, SEARCH, EXIT" << endl;
+      cout << "CMDS: JOIN, PUBLISH, SEARCH, FETCH, EXIT" << endl;
       continue;
     }
   }

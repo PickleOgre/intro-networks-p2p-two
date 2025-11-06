@@ -45,6 +45,6 @@ search(int sockd, const std::string& filename);
  * network.  Peers must JOIN (or REGISTER to) the P2P network before sending a
  * FETCH request. */
 int
-fetch(std::string filename);
+fetch(int sockd, const std::string& filename);
 
 #endif

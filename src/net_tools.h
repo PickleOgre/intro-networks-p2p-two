@@ -36,4 +36,17 @@ safeSend(const int sockd, const char* buf, const ssize_t len);
 int
 safeRecv(const int sockd, char* buf, const ssize_t len);
 
+/* Converts a 32-bit IP address (host byte order) to a string representation.
+ * ipAddr in host byte order => converted with ntohl.
+ * ipStr buffer must be MINIMUM => INET_ADDRSTRLEN bytes. 
+ */
+void
+ipToString(uint32_t ipAddr, char* ipStr);
+
+/* cConverts a 16-bit port number to a string representation.
+ * portStr buffer must be at least 6 bytes (max "65535\0"). 
+ */
+void
+portToString(uint16_t port, char* portStr);
+
 #endif

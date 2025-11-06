@@ -1,0 +1,10 @@
+#mac
+.DS_Store
+.AppleDouble
+.LSOverride
+#compiled shit
+.vscode/
+*.o
+peer
+p3_peer
+p3_registry
