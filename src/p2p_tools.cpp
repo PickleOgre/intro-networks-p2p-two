@@ -163,7 +163,7 @@ fetch(int sockd, const string& filename)
     return -1;
   }
 
-  uint32_t peerID, ipAddr; // vars for response feild (can split this section &
+  uint32_t peerID, ipAddr; // vars for response field (can split this section &
                            // onwards into helper func latr)
   uint16_t port;
   memcpy(&peerID, response, 4);     // peer id 0-3
@@ -231,7 +231,6 @@ fetch(int sockd, const string& filename)
   }
 
   output_file.close();
-
   close(peerSockd);
   return 0;
 }
