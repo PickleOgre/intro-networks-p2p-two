@@ -206,12 +206,21 @@ fetch(int sockd, const string& filename)
   // Recieve and output to file.
   const size_t len = 1024;
   char resp[len];
+  ssize_t bytes_received = 0;
   std::ofstream output_file(filename, std::ios::binary);
+
+  // Check the response code sent by the registry 
+  bytes_received = safeRecv(peerSockd, resp, 1);
+  if (bytes_received == 0) {
+    return 0;
+  } else if (resp[0] != 0) {
+    cerr << "Error, registry failed to send" << endl;
+    return -1; 
+  }
 
   bool socket_open = true;
   while (socket_open == true) {
     // Loop until the socket closes
-    ssize_t bytes_received = 0;
     bytes_received = safeRecv(peerSockd, resp, len);
     if (bytes_received > 0) {
       output_file.write(resp, bytes_received);
