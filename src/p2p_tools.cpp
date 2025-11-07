@@ -144,6 +144,7 @@ search(int sockd, const string& filename)
 int
 fetch(int sockd, const string& filename)
 {
+  // NATE'S CODE ///////////////////////
   // 1 (action code) + (file) + 1 (endl)
   size_t msgSize = 1 + filename.length() + 1;
   char* req = new char[msgSize];
@@ -203,28 +204,30 @@ fetch(int sockd, const string& filename)
   // cleanup
   delete[] fetchReq;
 
+  // JOE'S CODE ///////////////
   // Recieve and output to file.
   const size_t len = 1024;
   char resp[len];
   ssize_t bytes_received = 0;
   std::ofstream output_file(filename, std::ios::binary);
 
-  // Check the response code sent by the registry 
+  // Receive and check the response code sent by the peer
   bytes_received = safeRecv(peerSockd, resp, 1);
   if (bytes_received == 0) {
-    return 0;
+    cerr << "Socket closed prematurely" << endl;
+    return -1;
   } else if (resp[0] != 0) {
-    cerr << "Error, registry failed to send" << endl;
-    return -1; 
+    cerr << "Peer unable to send file" << endl;
+    close(peerSockd);
+    return -1;
   }
 
   bool socket_open = true;
-  while (socket_open == true) {
+  while (socket_open) {
     // Loop until the socket closes
     bytes_received = safeRecv(peerSockd, resp, len);
     if (bytes_received > 0) {
       output_file.write(resp, bytes_received);
-      output_file.flush();
     } else if (bytes_received == 0) {
       socket_open = false;
     }
